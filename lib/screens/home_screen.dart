@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dev_chart_screen.dart'; // Import the DevChartScreen class
+import 'my_dev_chart.dart'; // Import the MyDevChartScreen class
+import 'my_dev_notes.dart'; // Import the MyDevNotesScreen class
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,7 +25,11 @@ class HomeScreen extends StatelessWidget {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () {
-                      // Handle the 'Dev Chart' button press
+                      // Navigate to DevChartScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DevChartScreen()),
+                      );
                     },
                     child: Text(
                       'Dev Chart',
@@ -42,7 +49,11 @@ class HomeScreen extends StatelessWidget {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () {
-                      // Handle the 'My Dev Chart' button press
+                      // Navigate to MyDevChartScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyDevChartScreen()),
+                      );
                     },
                     child: Text(
                       'My Dev Chart',
@@ -62,7 +73,11 @@ class HomeScreen extends StatelessWidget {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () {
-                      // Handle the 'My Dev Notes' button press
+                      // Navigate to MyDevNotesScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyDevNotesScreen()),
+                      );
                     },
                     child: Text(
                       'My Dev Notes',
