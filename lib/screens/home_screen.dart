@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dev_chart_screen.dart'; // Import the DevChartScreen class
-import 'my_dev_chart.dart'; // Import the MyDevChartScreen class
-import 'my_dev_notes.dart'; // Import the MyDevNotesScreen class
+import 'my_dev_chart_screen.dart'; // Import the MyDevChartScreen class
+import 'my_dev_notes_screen.dart'; // Import the MyDevNotesScreen class
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
