@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../lists/iso.dart';
-import '../lists/film_types.dart';
-import '../lists/cameras.dart';
-import '../lists/lenses.dart';
-import '../lists/developers.dart';
-import '../lists/dilutions.dart';
+import 'package:my_dev_chart/lists/iso.dart';
+import 'package:my_dev_chart/lists/film_types.dart';
+import 'package:my_dev_chart/lists/cameras.dart';
+import 'package:my_dev_chart/lists/lenses.dart';
+import 'package:my_dev_chart/lists/developers.dart';
+import 'package:my_dev_chart/lists/dilutions.dart';
+import 'package:my_dev_chart/databases/database_helper.dart';
 
 class TimeEditingController extends TextEditingController {
   @override
@@ -74,12 +75,31 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
     }
   }
 
-  void _saveForm() {
+  void _saveForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       _lastUsedFilmNumber = _filmNumber ?? _lastUsedFilmNumber;
       _filmNumberController.text = (_lastUsedFilmNumber + 1).toString();
-      // Save the form data to the database
+
+      int year = _selectedDate?.year ?? DateTime.now().year;
+
+      Map<String, dynamic> filmData = {
+        'filmNumber': _filmNumberController.text,
+        'selectedDate': _selectedDate,
+        'selectedIso': _selectedIso,
+        'filmType': _filmType,
+        'selectedCamera': _selectedCamera,
+        'selectedLenses': _selectedLenses,
+        'selectedDeveloper': _selectedDeveloper,
+        'selectedDilution': _selectedDilution,
+        'developingTime': _developingTime,
+        'temperature': _temperature,
+        'comments': _comments,
+      };
+
+      await DatabaseHelper().insertFilm(filmData, year);
+
+      // Refresh the UI or navigate to another screen as needed
     }
   }
 
