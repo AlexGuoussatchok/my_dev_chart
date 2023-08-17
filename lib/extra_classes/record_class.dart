@@ -1,16 +1,16 @@
 class RecordClass {
-  int filmNumber;
-  DateTime date;
-  String film;
-  String selectedIso;
-  String filmType;
-  String? camera;
-  String? lenses;
-  String developer;
-  String dilution;
-  String? developingTime;
-  double temperature;
-  String? comments;
+  final String filmNumber;
+  final DateTime date;
+  final String film;
+  final String selectedIso;
+  final String filmType;
+  final String? camera;
+  final String? lenses;
+  final String developer;
+  final String dilution;
+  final String? developingTime;
+  final double temperature;
+  final String? comments;
 
   RecordClass({
     required this.filmNumber,
@@ -18,12 +18,12 @@ class RecordClass {
     required this.film,
     required this.selectedIso,
     required this.filmType,
-    required this.camera,
-    required this.lenses,
+    this.camera,
+    this.lenses,
     required this.developer,
     required this.dilution,
-    required this.developingTime,
+    this.developingTime,
     required this.temperature,
-    required this.comments,
+    this.comments,
   });
 }

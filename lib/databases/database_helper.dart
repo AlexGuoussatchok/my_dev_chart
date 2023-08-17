@@ -45,7 +45,6 @@ class DatabaseHelper {
     return highestFilmNumber ?? 0;
   }
 
-
   Future<void> insertFilm(Map<String, dynamic> filmData) async {
     final db = await database;
 
@@ -64,6 +63,26 @@ class DatabaseHelper {
     await db.insert('films_2023', filmData);
   }
 
+  Future<void> updateRecord(Map<String, dynamic> updatedData) async {
+    final db = await database;
+
+    await db.update(
+      'films_2023',
+      updatedData,
+      where: 'filmNumber = ?',
+      whereArgs: [updatedData['filmNumber']],
+    );
+  }
+
+  Future<void> deleteRecord(String filmNumber) async {
+    final db = await database;
+
+    await db.delete(
+      'films_2023',
+      where: 'filmNumber = ?',
+      whereArgs: [filmNumber],
+    );
+  }
 
   Future<List<RecordClass>> getRecords() async {
     final db = await database;
@@ -71,7 +90,7 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (index) {
       return RecordClass(
-        filmNumber: int.parse(maps[index]['filmNumber']),
+        filmNumber: maps[index]['filmNumber'].toString(),
         date: DateTime.parse(maps[index]['date']),
         film: maps[index]['film'],
         selectedIso: maps[index]['selectedIso'],
@@ -86,5 +105,4 @@ class DatabaseHelper {
       );
     });
   }
-
 }

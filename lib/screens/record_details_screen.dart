@@ -1,16 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
+import 'package:my_dev_chart/databases/database_helper.dart';
+import 'package:my_dev_chart/screens/edit_record_screen.dart';
 
 class RecordDetailsScreen extends StatelessWidget {
   final RecordClass record;
 
   RecordDetailsScreen(this.record);
 
+  Future<void> _deleteRecord(BuildContext context) async {
+    await DatabaseHelper().deleteRecord(record.filmNumber); // Assuming filmNumber is unique
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Record Details'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'delete') {
+                _deleteRecord(context);
+              } else if (value == 'edit') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditRecordScreen(record),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'edit',
+                child: Text('Edit Record'),
+              ),
+              PopupMenuItem<String>(
+                value: 'delete',
+                child: Text('Delete Record'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -21,16 +54,14 @@ class RecordDetailsScreen extends StatelessWidget {
             Text('Date: ${record.date.toString()}'),
             Text('Film: ${record.film}'),
             Text('ISO: ${record.selectedIso}'),
-            Text('Film type: ${record.filmType}'),
-            Text('Camera: ${record.camera}'),
-            Text('Lenses: ${record.lenses}'),
+            Text('Film Type: ${record.filmType}'),
+            Text('Camera: ${record.camera ?? 'N/A'}'),
+            Text('Lenses: ${record.lenses ?? 'N/A'}'),
             Text('Developer: ${record.developer}'),
             Text('Dilution: ${record.dilution}'),
-            Text('Developing time: ${record.developingTime}'),
-            Text('Temperature: ${record.temperature}'),
-            Text('Comments: ${record.comments}'),
-
-            // Add more fields here
+            Text('Developing Time: ${record.developingTime ?? 'N/A'}'),
+            Text('Temperature: ${record.temperature.toString()} °C'),
+            Text('Comments: ${record.comments ?? 'N/A'}'),
           ],
         ),
       ),
