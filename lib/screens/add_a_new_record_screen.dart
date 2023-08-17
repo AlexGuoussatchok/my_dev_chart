@@ -59,7 +59,15 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   @override
   void initState() {
     super.initState();
-    _filmNumberController.text = (_lastUsedFilmNumber + 1).toString();
+    fetchAndSetFilmNumber();
+  }
+
+  Future<void> fetchAndSetFilmNumber() async {
+    final highestFilmNumber = await DatabaseHelper().getHighestFilmNumber();
+    setState(() {
+      _lastUsedFilmNumber = highestFilmNumber + 1;
+      _filmNumberController.text = _lastUsedFilmNumber.toString();
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -79,6 +87,10 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   void _saveForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // Increment film number
+      _lastUsedFilmNumber++;
+      _filmNumberController.text = _lastUsedFilmNumber.toString();
 
       Map<String, dynamic> filmData = {
         'filmNumber': _filmNumberController.text,

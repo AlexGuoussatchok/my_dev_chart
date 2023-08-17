@@ -38,10 +38,32 @@ class DatabaseHelper {
     });
   }
 
+  Future<int> getHighestFilmNumber() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT MAX(filmNumber) FROM films_2023');
+    int? highestFilmNumber = result.first['MAX(filmNumber)'] as int?;
+    return highestFilmNumber ?? 0;
+  }
+
+
   Future<void> insertFilm(Map<String, dynamic> filmData) async {
     final db = await database;
+
+    // Check if the film number already exists
+    final existingRecords = await db.query(
+      'films_2023',
+      where: 'filmNumber = ?',
+      whereArgs: [filmData['filmNumber']],
+    );
+
+    if (existingRecords.isNotEmpty) {
+      // Film number already exists, handle accordingly (show error, etc.)
+      return;
+    }
+
     await db.insert('films_2023', filmData);
   }
+
 
   Future<List<RecordClass>> getRecords() async {
     final db = await database;
@@ -64,4 +86,5 @@ class DatabaseHelper {
       );
     });
   }
+
 }
