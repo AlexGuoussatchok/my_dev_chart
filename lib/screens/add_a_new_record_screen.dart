@@ -6,6 +6,7 @@ import 'package:my_dev_chart/lists/lenses.dart';
 import 'package:my_dev_chart/lists/developers.dart';
 import 'package:my_dev_chart/lists/dilutions.dart';
 import 'package:my_dev_chart/databases/database_helper.dart';
+import 'package:my_dev_chart/lists/films_list.dart';
 
 class TimeEditingController extends TextEditingController {
   @override
@@ -24,13 +25,14 @@ class TimeEditingController extends TextEditingController {
     if (sanitizedInput.length <= 2) {
       return '${sanitizedInput.padRight(2, ' ')} (min) :';
     } else if (sanitizedInput.length <= 4) {
-      return '${sanitizedInput.substring(0, 2)} (min) : ${sanitizedInput.substring(2).padRight(2, ' ')} (sec)';
+      return '${sanitizedInput.substring(0, 2)} (min) : ${sanitizedInput
+          .substring(2).padRight(2, ' ')} (sec)';
     } else {
-      return '${sanitizedInput.substring(0, 2)} (min) : ${sanitizedInput.substring(2, 4)} (sec)';
+      return '${sanitizedInput.substring(0, 2)} (min) : ${sanitizedInput
+          .substring(2, 4)} (sec)';
     }
   }
 }
-
 class AddNewRecordScreen extends StatefulWidget {
   @override
   _AddNewRecordScreenState createState() => _AddNewRecordScreenState();
@@ -38,8 +40,10 @@ class AddNewRecordScreen extends StatefulWidget {
 
 class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController _filmNumberController = TextEditingController();
+  int _lastUsedFilmNumber = 0;
   DateTime? _selectedDate;
-  int? _filmNumber;
+  String? _selectedFilm;
   String? _selectedIso;
   String? _filmType;
   String? _selectedCamera;
@@ -49,9 +53,6 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   String? _developingTime;
   double? _temperature;
   String? _comments;
-
-  TextEditingController _filmNumberController = TextEditingController();
-  int _lastUsedFilmNumber = 0;
 
   TimeEditingController _timeController = TimeEditingController();
 
@@ -78,26 +79,23 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   void _saveForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      _lastUsedFilmNumber = _filmNumber ?? _lastUsedFilmNumber;
-      _filmNumberController.text = (_lastUsedFilmNumber + 1).toString();
-
-      int year = _selectedDate?.year ?? DateTime.now().year;
 
       Map<String, dynamic> filmData = {
         'filmNumber': _filmNumberController.text,
-        'selectedDate': _selectedDate,
+        'date': _selectedDate?.toIso8601String(),
+        'film': _selectedFilm,
         'selectedIso': _selectedIso,
         'filmType': _filmType,
-        'selectedCamera': _selectedCamera,
-        'selectedLenses': _selectedLenses,
-        'selectedDeveloper': _selectedDeveloper,
-        'selectedDilution': _selectedDilution,
+        'camera': _selectedCamera,
+        'lenses': _selectedLenses,
+        'developer': _selectedDeveloper,
+        'dilution': _selectedDilution,
         'developingTime': _developingTime,
         'temperature': _temperature,
         'comments': _comments,
       };
 
-      await DatabaseHelper().insertFilm(filmData, year);
+      await DatabaseHelper().insertFilm(filmData);
 
       // Refresh the UI or navigate to another screen as needed
     }
@@ -120,7 +118,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                 controller: _filmNumberController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Film Number'),
-                onSaved: (value) => _filmNumber = int.tryParse(value ?? ''),
+                onSaved: (value) => _selectedFilm = value,
               ),
               SizedBox(height: 16),
               GestureDetector(
@@ -133,7 +131,9 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                       suffixIcon: Icon(Icons.calendar_today),
                     ),
                     controller: _selectedDate != null
-                        ? TextEditingController(text: _selectedDate!.toLocal().toString().split(' ')[0])
+                        ? TextEditingController(
+                        text:
+                        _selectedDate!.toLocal().toString().split(' ')[0])
                         : null,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -144,7 +144,22 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedFilm,
+                items: filmsList.map((film) {
+                  return DropdownMenuItem<String>(
+                    value: film,
+                    child: Text(film),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedFilm = value;
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Film'),
+                onSaved: (value) => _selectedFilm = value,
+              ),
               DropdownButtonFormField<String>(
                 value: _selectedIso,
                 items: isoValues.map((iso) {
@@ -161,7 +176,6 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                 decoration: InputDecoration(labelText: 'ISO'),
                 onSaved: (value) => _selectedIso = value,
               ),
-              SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _filmType,
                 items: filmTypeValues.map((filmType) {
@@ -245,7 +259,8 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
               TextFormField(
                 keyboardType: TextInputType.number,
                 controller: _timeController,
-                decoration: InputDecoration(labelText: 'Developing Time (min : sec)'),
+                decoration:
+                InputDecoration(labelText: 'Developing Time (min : sec)'),
                 onSaved: (value) => _developingTime = value,
               ),
               TextFormField(
