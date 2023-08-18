@@ -56,10 +56,13 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
 
   TimeEditingController _timeController = TimeEditingController();
 
+  bool _areRequiredFieldsFilled = false;
+
   @override
   void initState() {
     super.initState();
     fetchAndSetFilmNumber();
+    _filmType = 'type 135'; // Set the initial value to match one of the items in the filmTypeValues list
   }
 
   Future<void> fetchAndSetFilmNumber() async {
@@ -121,6 +124,11 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
       ),
       body: Form(
         key: _formKey,
+        onChanged: () {
+          setState(() {
+            _areRequiredFieldsFilled = _formKey.currentState!.validate();
+          });
+        },
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -130,6 +138,13 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                 controller: _filmNumberController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Film Number'),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a Film Number';
+                  }
+                  return null;
+                },
                 onSaved: (value) => _selectedFilm = value,
               ),
               SizedBox(height: 16),
@@ -170,6 +185,13 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                   });
                 },
                 decoration: InputDecoration(labelText: 'Film'),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a Film';
+                  }
+                  return null;
+                },
                 onSaved: (value) => _selectedFilm = value,
               ),
               DropdownButtonFormField<String>(
@@ -180,14 +202,22 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     child: Text(iso),
                   );
                 }).toList(),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a Film ISO';
+                  }
+                  return null;
+                },
                 onChanged: (value) {
                   setState(() {
                     _selectedIso = value;
                   });
                 },
                 decoration: InputDecoration(labelText: 'ISO'),
-                onSaved: (value) => _selectedIso = value,
+                onSaved: (value) => _selectedIso = value!, // Assign to _selectedIso
               ),
+
               DropdownButtonFormField<String>(
                 value: _filmType,
                 items: filmTypeValues.map((filmType) {
@@ -196,14 +226,22 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     child: Text(filmType),
                   );
                 }).toList(),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose the Film type';
+                  }
+                  return null;
+                },
                 onChanged: (value) {
                   setState(() {
                     _filmType = value;
                   });
                 },
                 decoration: InputDecoration(labelText: 'Film Type'),
-                onSaved: (value) => _filmType = value,
+                onSaved: (value) => _filmType = value!, // Assign to _filmType
               ),
+
               DropdownButtonFormField<String>(
                 value: _selectedCamera,
                 items: camerasValues.map((camera) {
@@ -244,14 +282,22 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     child: Text(developer),
                   );
                 }).toList(),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose the developer used';
+                  }
+                  return null;
+                },
                 onChanged: (value) {
                   setState(() {
                     _selectedDeveloper = value;
                   });
                 },
                 decoration: InputDecoration(labelText: 'Developer'),
-                onSaved: (value) => _selectedDeveloper = value,
+                onSaved: (value) => _selectedDeveloper = value!, // Assign to _selectedDeveloper
               ),
+
               DropdownButtonFormField<String>(
                 value: _selectedDilution,
                 items: dilutionsValues.map((dilution) {
@@ -260,26 +306,49 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     child: Text(dilution),
                   );
                 }).toList(),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose the dilution';
+                  }
+                  return null;
+                },
                 onChanged: (value) {
                   setState(() {
                     _selectedDilution = value;
                   });
                 },
                 decoration: InputDecoration(labelText: 'Dilution'),
-                onSaved: (value) => _selectedDilution = value,
+                onSaved: (value) => _selectedDilution = value!, // Assign to _selectedDilution
               ),
+
               TextFormField(
                 keyboardType: TextInputType.number,
                 controller: _timeController,
-                decoration:
-                InputDecoration(labelText: 'Developing Time (min : sec)'),
-                onSaved: (value) => _developingTime = value,
+                decoration: InputDecoration(labelText: 'Developing Time (min : sec)'),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the developing time';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _developingTime = value!, // Assign to _developingTime
               ),
+
               TextFormField(
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Temperature (°C)'),
-                onSaved: (value) => _temperature = double.tryParse(value ?? ''),
+                // Validator for required field
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the temperature';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _temperature = double.parse(value!), // Assign to _temperature
               ),
+
               TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
@@ -288,7 +357,11 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _saveForm,
+                onPressed: _areRequiredFieldsFilled ? _saveForm : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                  _areRequiredFieldsFilled ? Colors.blue : Colors.grey,
+                ),
                 child: Text('Save'),
               ),
             ],
