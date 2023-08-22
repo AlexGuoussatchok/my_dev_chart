@@ -1,6 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 class DatabaseHelper {
   static Database? _database;
@@ -12,14 +15,12 @@ class DatabaseHelper {
   }
 
   Future<Database> initDatabase() async {
-    String databasesPath = await getDatabasesPath();
-    String year = "2023"; // Extract year from selectedDate or use a default year
-    String dbName = 'films_$year.db';
-    String path = join(databasesPath, dbName);
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'my_dev_notes.db');
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute('''
-        CREATE TABLE IF NOT EXISTS films_$year (
+        CREATE TABLE IF NOT EXISTS my_dev_notes (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           filmNumber TEXT,
           date TEXT,
@@ -40,17 +41,18 @@ class DatabaseHelper {
 
   Future<int> getHighestFilmNumber() async {
     final db = await database;
-    final result = await db.rawQuery('SELECT MAX(filmNumber) FROM films_2023');
-    int? highestFilmNumber = result.first['MAX(filmNumber)'] as int?;
+    final result = await db.rawQuery('SELECT MAX(filmNumber) FROM my_dev_notes');
+    final maxFilmNumberString = result.first['MAX(filmNumber)'] as String?;
+    int? highestFilmNumber =
+    maxFilmNumberString != null ? int.tryParse(maxFilmNumberString) : null;
     return highestFilmNumber ?? 0;
   }
 
   Future<void> insertFilm(Map<String, dynamic> filmData) async {
     final db = await database;
 
-    // Check if the film number already exists
     final existingRecords = await db.query(
-      'films_2023',
+      'my_dev_notes',
       where: 'filmNumber = ?',
       whereArgs: [filmData['filmNumber']],
     );
@@ -60,14 +62,14 @@ class DatabaseHelper {
       return;
     }
 
-    await db.insert('films_2023', filmData);
+    await db.insert('my_dev_notes', filmData);
   }
 
   Future<void> updateRecord(Map<String, dynamic> updatedData) async {
     final db = await database;
 
     await db.update(
-      'films_2023',
+      'my_dev_notes',
       updatedData,
       where: 'filmNumber = ?',
       whereArgs: [updatedData['filmNumber']],
@@ -78,7 +80,7 @@ class DatabaseHelper {
     final db = await database;
 
     await db.delete(
-      'films_2023',
+      'my_dev_notes',
       where: 'filmNumber = ?',
       whereArgs: [filmNumber],
     );
@@ -86,7 +88,7 @@ class DatabaseHelper {
 
   Future<List<RecordClass>> getRecords() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('films_2023');
+    final List<Map<String, dynamic>> maps = await db.query('my_dev_notes');
 
     return List.generate(maps.length, (index) {
       return RecordClass(
@@ -104,5 +106,74 @@ class DatabaseHelper {
         comments: maps[index]['comments'],
       );
     });
+  }
+
+  // Export the database to a specified location
+  Future<void> exportDatabase() async {
+    try {
+      final status = await Permission.storage.request();
+      if (status.isGranted) {
+        Directory documentsDirectory = await getApplicationDocumentsDirectory();
+        String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
+
+        Directory? externalDirectory = await getExternalStorageDirectory();
+
+        if (externalDirectory == null) {
+          // Handle the case where external storage is not available
+          return;
+        }
+
+        String exportFileName = 'my_dev_notes_export.db';
+        String exportDbPath = join(externalDirectory.path, exportFileName);
+
+        if (await File(currentDbPath).exists()) {
+          await File(currentDbPath).copy(exportDbPath);
+          print('Database exported successfully to: $exportDbPath');
+        } else {
+          // Handle the case where the database file doesn't exist
+        }
+      } else {
+        // Handle the case where permission is denied
+        print('Permission denied for exporting');
+      }
+    } catch (error) {
+      print('Export Error: $error');
+    }
+  }
+
+  // Import a database file into the app's database directory
+  Future<void> importDatabase(String filePath) async {
+    try {
+      final status = await Permission.storage.request();
+      if (status.isGranted) {
+        Directory documentsDirectory = await getApplicationDocumentsDirectory();
+        String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
+        Directory? externalDirectory = await getExternalStorageDirectory();
+
+        if (externalDirectory == null) {
+          // Handle the case where external storage is not available
+          return;
+        }
+
+        String exportFileName = 'my_dev_notes_export.db';
+        String exportDbPath = join(externalDirectory.path, exportFileName);
+        File sourceFile = File(exportDbPath);
+
+        if (await sourceFile.exists()) {
+          if (await File(currentDbPath).exists()) {
+            await File(currentDbPath).delete();
+          }
+          await sourceFile.copy(currentDbPath);
+          print('Database imported successfully');
+        } else {
+          // Handle the case where the source file doesn't exist
+        }
+      } else {
+        // Handle the case where permission is denied
+        print('Permission denied for importing');
+      }
+    } catch (error) {
+      print('Import Error: $error');
+    }
   }
 }

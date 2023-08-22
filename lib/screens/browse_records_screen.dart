@@ -4,6 +4,10 @@ import 'package:my_dev_chart/extra_classes/record_class.dart';
 import 'package:my_dev_chart/screens/record_details_screen.dart'; // Import the new details screen
 
 class BrowseRecordsScreen extends StatelessWidget {
+  final DatabaseHelper dbHelper; // Add this line
+
+  BrowseRecordsScreen({required this.dbHelper});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

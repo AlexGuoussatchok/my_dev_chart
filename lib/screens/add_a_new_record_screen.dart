@@ -34,6 +34,10 @@ class TimeEditingController extends TextEditingController {
   }
 }
 class AddNewRecordScreen extends StatefulWidget {
+  final DatabaseHelper dbHelper; // Receive the dbHelper instance
+
+  AddNewRecordScreen({required this.dbHelper});
+
   @override
   _AddNewRecordScreenState createState() => _AddNewRecordScreenState();
 }
@@ -62,11 +66,11 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   void initState() {
     super.initState();
     fetchAndSetFilmNumber();
-    _filmType = 'type 135'; // Set the initial value to match one of the items in the filmTypeValues list
+    _filmType = 'type 135';
   }
 
   Future<void> fetchAndSetFilmNumber() async {
-    final highestFilmNumber = await DatabaseHelper().getHighestFilmNumber();
+    final highestFilmNumber = await widget.dbHelper.getHighestFilmNumber(); // Use dbHelper from widget
     setState(() {
       _lastUsedFilmNumber = highestFilmNumber + 1;
       _filmNumberController.text = _lastUsedFilmNumber.toString();
