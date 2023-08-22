@@ -109,7 +109,7 @@ class DatabaseHelper {
   }
 
   // Export the database to a specified location
-  Future<void> exportDatabase() async {
+  Future<List<int>> exportDatabaseBytes() async {
     try {
       final status = await Permission.storage.request();
       if (status.isGranted) {
@@ -120,26 +120,40 @@ class DatabaseHelper {
 
         if (externalDirectory == null) {
           // Handle the case where external storage is not available
-          return;
+          return [];
         }
 
+        // The Documents folder path on external storage
+        String documentsFolderPath = join(externalDirectory.path, 'Documents');
+
+        // Ensure the Documents folder exists
+        await Directory(documentsFolderPath).create(recursive: true);
+
         String exportFileName = 'my_dev_notes_export.db';
-        String exportDbPath = join(externalDirectory.path, exportFileName);
+        String exportDbPath = join(documentsFolderPath, exportFileName);
 
         if (await File(currentDbPath).exists()) {
           await File(currentDbPath).copy(exportDbPath);
           print('Database exported successfully to: $exportDbPath');
+
+          // Read the exported file as bytes and return them
+          final bytes = await File(exportDbPath).readAsBytes();
+          return bytes;
         } else {
           // Handle the case where the database file doesn't exist
+          return [];
         }
       } else {
         // Handle the case where permission is denied
         print('Permission denied for exporting');
+        return [];
       }
     } catch (error) {
       print('Export Error: $error');
+      return [];
     }
   }
+
 
   // Import a database file into the app's database directory
   Future<void> importDatabase(String filePath) async {

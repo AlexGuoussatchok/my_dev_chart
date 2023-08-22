@@ -50,14 +50,23 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       );
       return;
     }
+
     try {
-      await dbHelper.exportDatabase();
+      // Get the app's document directory.
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+
+      // Specify the export path in the document directory.
+      String exportPath = '${appDocDir.path}/my_dev_notes_export.db';
+
+      // Export the database to the specified location.
+      await File(exportPath).writeAsBytes(await dbHelper.exportDatabaseBytes());
+
       // Show a success message to the user
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Export Successful'),
-          content: Text('The database was exported successfully.'),
+          content: Text('The database was exported successfully to Documents folder.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -83,6 +92,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       );
     }
   }
+
 
   Future<void> importDatabase(BuildContext context) async {
     try {
