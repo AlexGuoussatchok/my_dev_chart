@@ -129,7 +129,7 @@ class DatabaseHelper {
         // Ensure the Documents folder exists
         await Directory(documentsFolderPath).create(recursive: true);
 
-        String exportFileName = 'my_dev_notes_export.db';
+        String exportFileName = 'my_dev_notes.db';
         String exportDbPath = join(documentsFolderPath, exportFileName);
 
         if (await File(currentDbPath).exists()) {

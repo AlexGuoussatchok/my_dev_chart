@@ -6,6 +6,7 @@ import 'dart:io';
 import 'browse_records_screen.dart';
 import 'add_a_new_record_screen.dart';
 import 'statistics_screen.dart';
+import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
 
 class MyDevNotesScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
     print('App Documents Directory: ${appDocDir.path}');
   }
 
-  Future<void> exportDatabase(BuildContext context) async {
+  Future<void> exportDatabase(BuildContext context) async { // Pass the context as a parameter
     // Request external storage permission
     final status = await Permission.storage.request();
     if (!status.isGranted) {
@@ -56,7 +57,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       Directory appDocDir = await getApplicationDocumentsDirectory();
 
       // Specify the export path in the document directory.
-      String exportPath = '${appDocDir.path}/my_dev_notes_export.db';
+      String exportPath = '${appDocDir.path}/my_dev_notes.db';
 
       // Export the database to the specified location.
       await File(exportPath).writeAsBytes(await dbHelper.exportDatabaseBytes());
@@ -93,67 +94,56 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
     }
   }
 
-
-  Future<void> importDatabase(BuildContext context) async {
+  Future<void> importDatabase() async {
     try {
+      // Request external storage permission
       final status = await Permission.storage.request();
-      if (!status.isGranted) {
+      if (status.isGranted) {
+        // Get the app's document directory where the existing database resides
+        Directory documentsDirectory = await getApplicationDocumentsDirectory();
+        String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
+
+        // Get the external storage directory where the imported database is located
+        Directory? externalDirectory = await getExternalStorageDirectory();
+
+        if (externalDirectory == null) {
+          // Handle the case where external storage is not available
+          return;
+        }
+
+        // Set the desired file name for the imported database
+        String exportFileName = 'my_dev_notes.db';
+
+        // Construct the full path to the imported database
+        String exportDbPath = join(externalDirectory.path, exportFileName);
+
+        // Create a File object representing the imported database file
+        File sourceFile = File(exportDbPath);
+
+        if (await sourceFile.exists()) {
+          // If the imported database file exists, check if the current database file exists
+          if (await File(currentDbPath).exists()) {
+            // If the current database file exists, delete it to replace with the imported one
+            await File(currentDbPath).delete();
+          }
+
+          // Copy the imported database file to the app's document directory
+          await sourceFile.copy(currentDbPath);
+          print('Database imported successfully');
+        } else {
+          // Handle the case where the source file doesn't exist
+        }
+      } else {
         // Handle the case where permission is denied
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Permission Denied'),
-            content: Text('Permission denied for importing.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-      if (result != null && result.files.isNotEmpty) {
-        final sourceFile = File(result.files.single.path!);
-
-        await dbHelper.importDatabase(sourceFile.path);
-
-        // Show a success message to the user
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Import Successful'),
-            content: Text('The database was imported successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        print('Permission denied for importing');
       }
     } catch (error) {
-      // Handle any errors that occur during import
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Import Error'),
-          content: Text('An error occurred while importing the database: $error'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      // Handle any errors that occur during the import process
+      print('Import Error: $error');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -164,9 +154,9 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'export') {
-                exportDatabase(context);
+                exportDatabase(context); // Pass the context here
               } else if (value == 'import') {
-                importDatabase(context);
+                importDatabase(); // No need to pass the context here
               }
             },
             itemBuilder: (BuildContext context) {
