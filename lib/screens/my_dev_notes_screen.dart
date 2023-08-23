@@ -99,39 +99,30 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       // Request external storage permission
       final status = await Permission.storage.request();
       if (status.isGranted) {
-        // Get the app's document directory where the existing database resides
-        Directory documentsDirectory = await getApplicationDocumentsDirectory();
-        String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
+        // Use file picker to select the import source
+        final FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-        // Get the external storage directory where the imported database is located
-        Directory? externalDirectory = await getExternalStorageDirectory();
+        if (result != null && result.files.isNotEmpty) {
+          final PlatformFile file = result.files.first;
+          String importFilePath = file.path ?? '';
 
-        if (externalDirectory == null) {
-          // Handle the case where external storage is not available
-          return;
-        }
+          // Get the app's document directory where the existing database resides
+          Directory documentsDirectory = await getApplicationDocumentsDirectory();
+          String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
 
-        // Set the desired file name for the imported database
-        String exportFileName = 'my_dev_notes.db';
+          if (await File(importFilePath).exists()) {
+            // If the imported database file exists, check if the current database file exists
+            if (await File(currentDbPath).exists()) {
+              // If the current database file exists, delete it to replace with the imported one
+              await File(currentDbPath).delete();
+            }
 
-        // Construct the full path to the imported database
-        String exportDbPath = join(externalDirectory.path, exportFileName);
-
-        // Create a File object representing the imported database file
-        File sourceFile = File(exportDbPath);
-
-        if (await sourceFile.exists()) {
-          // If the imported database file exists, check if the current database file exists
-          if (await File(currentDbPath).exists()) {
-            // If the current database file exists, delete it to replace with the imported one
-            await File(currentDbPath).delete();
+            // Copy the imported database file to the app's document directory
+            await File(importFilePath).copy(currentDbPath);
+            print('Database imported successfully');
+          } else {
+            // Handle the case where the source file doesn't exist
           }
-
-          // Copy the imported database file to the app's document directory
-          await sourceFile.copy(currentDbPath);
-          print('Database imported successfully');
-        } else {
-          // Handle the case where the source file doesn't exist
         }
       } else {
         // Handle the case where permission is denied
@@ -142,6 +133,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       print('Import Error: $error');
     }
   }
+
 
 
 

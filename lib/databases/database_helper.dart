@@ -155,33 +155,17 @@ class DatabaseHelper {
   }
 
 
-  // Import a database file into the app's database directory
   Future<void> importDatabase(String filePath) async {
     try {
       final status = await Permission.storage.request();
       if (status.isGranted) {
         Directory documentsDirectory = await getApplicationDocumentsDirectory();
         String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
-        Directory? externalDirectory = await getExternalStorageDirectory();
 
-        if (externalDirectory == null) {
-          // Handle the case where external storage is not available
-          return;
-        }
+        // Copy the imported database file to the app's document directory
+        await File(filePath).copy(currentDbPath);
 
-        String exportFileName = 'my_dev_notes_export.db';
-        String exportDbPath = join(externalDirectory.path, exportFileName);
-        File sourceFile = File(exportDbPath);
-
-        if (await sourceFile.exists()) {
-          if (await File(currentDbPath).exists()) {
-            await File(currentDbPath).delete();
-          }
-          await sourceFile.copy(currentDbPath);
-          print('Database imported successfully');
-        } else {
-          // Handle the case where the source file doesn't exist
-        }
+        print('Database imported successfully');
       } else {
         // Handle the case where permission is denied
         print('Permission denied for importing');
@@ -190,4 +174,6 @@ class DatabaseHelper {
       print('Import Error: $error');
     }
   }
+
+
 }
