@@ -4,21 +4,21 @@ import 'package:my_dev_chart/extra_classes/record_class.dart';
 import 'package:my_dev_chart/screens/record_details_screen.dart'; // Import the new details screen
 
 class BrowseRecordsScreen extends StatelessWidget {
-  final DatabaseHelper dbHelper; // Add this line
+  final DatabaseHelper dbHelper;
 
-  BrowseRecordsScreen({required this.dbHelper});
+  const BrowseRecordsScreen({Key? key, required this.dbHelper}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Browse Records'),
+        title: const Text('Browse Records'),
       ),
       body: FutureBuilder<List<RecordClass>>(
-        future: DatabaseHelper().getRecords(),
+        future: dbHelper.getRecords(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (snapshot.hasError) {
@@ -26,7 +26,7 @@ class BrowseRecordsScreen extends StatelessWidget {
               child: Text('Error: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('No records found.'),
             );
           } else {

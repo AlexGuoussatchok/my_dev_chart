@@ -20,7 +20,7 @@ class TimeEditingController extends TextEditingController {
   }
 
   String _formatTimeInput(String input) {
-    final sanitizedInput = input.replaceAll(RegExp(r'[^\d]'), '');
+    final sanitizedInput = input.replaceAll(RegExp(r'\D'), '');
 
     if (sanitizedInput.length <= 2) {
       return '${sanitizedInput.padRight(2, ' ')} (min) :';
@@ -33,10 +33,11 @@ class TimeEditingController extends TextEditingController {
     }
   }
 }
-class AddNewRecordScreen extends StatefulWidget {
-  final DatabaseHelper dbHelper; // Receive the dbHelper instance
 
-  AddNewRecordScreen({required this.dbHelper});
+class AddNewRecordScreen extends StatefulWidget {
+  final DatabaseHelper dbHelper;
+
+  const AddNewRecordScreen({required this.dbHelper, Key? key}) : super(key: key);
 
   @override
   _AddNewRecordScreenState createState() => _AddNewRecordScreenState();
@@ -70,9 +71,9 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   }
 
   Future<void> fetchAndSetFilmNumber() async {
-    final highestFilmNumber = await widget.dbHelper.getHighestFilmNumber(); // Use dbHelper from widget
+    final highestFilmNumber = await widget.dbHelper.getHighestFilmNumber();
     setState(() {
-      _lastUsedFilmNumber = highestFilmNumber + 1;
+      _lastUsedFilmNumber = highestFilmNumber;
       _filmNumberController.text = _lastUsedFilmNumber.toString();
     });
   }
@@ -89,6 +90,16 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
         _selectedDate = picked;
       });
     }
+  }
+
+  Future<void> insertFilm() async {
+    // Create filmData using user input or other data
+    Map<String, dynamic> filmData = {
+      // ... initialize filmData with user input
+    };
+
+    // Call the insertFilmWithContext method with filmData
+    await widget.dbHelper.insertFilmWithContext(context, filmData);
   }
 
   void _saveForm() async {
@@ -114,9 +125,6 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
         'comments': _comments,
       };
 
-      await DatabaseHelper().insertFilm(filmData);
-
-      // Refresh the UI or navigate to another screen as needed
     }
   }
 
@@ -124,7 +132,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add A New Record'),
+        title: const Text('Add A New Record'),
       ),
       body: Form(
         key: _formKey,
@@ -134,14 +142,14 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
           });
         },
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _filmNumberController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Film Number'),
+                decoration: const InputDecoration(labelText: 'Film Number'),
                 // Validator for required field
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -151,13 +159,13 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                 },
                 onSaved: (value) => _selectedFilm = value,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               GestureDetector(
                 onTap: () => _selectDate(context),
                 child: AbsorbPointer(
                   child: TextFormField(
                     keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Date',
                       suffixIcon: Icon(Icons.calendar_today),
                     ),
@@ -188,7 +196,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedFilm = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Film'),
+                decoration: const InputDecoration(labelText: 'Film'),
                 // Validator for required field
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -218,7 +226,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedIso = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'ISO'),
+                decoration: const InputDecoration(labelText: 'ISO'),
                 onSaved: (value) => _selectedIso = value!, // Assign to _selectedIso
               ),
 
@@ -242,7 +250,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _filmType = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Film Type'),
+                decoration: const InputDecoration(labelText: 'Film Type'),
                 onSaved: (value) => _filmType = value!, // Assign to _filmType
               ),
 
@@ -259,7 +267,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedCamera = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Camera'),
+                decoration: const InputDecoration(labelText: 'Camera'),
                 onSaved: (value) => _selectedCamera = value,
               ),
               DropdownButtonFormField<String>(
@@ -275,7 +283,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedLenses = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Lenses'),
+                decoration: const InputDecoration(labelText: 'Lenses'),
                 onSaved: (value) => _selectedLenses = value,
               ),
               DropdownButtonFormField<String>(
@@ -298,7 +306,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedDeveloper = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Developer'),
+                decoration: const InputDecoration(labelText: 'Developer'),
                 onSaved: (value) => _selectedDeveloper = value!, // Assign to _selectedDeveloper
               ),
 
@@ -322,14 +330,14 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
                     _selectedDilution = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Dilution'),
+                decoration: const InputDecoration(labelText: 'Dilution'),
                 onSaved: (value) => _selectedDilution = value!, // Assign to _selectedDilution
               ),
 
               TextFormField(
                 keyboardType: TextInputType.number,
                 controller: _timeController,
-                decoration: InputDecoration(labelText: 'Developing Time (min : sec)'),
+                decoration: const InputDecoration(labelText: 'Developing Time (min : sec)'),
                 // Validator for required field
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -342,7 +350,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
 
               TextFormField(
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Temperature (°C)'),
+                decoration: const InputDecoration(labelText: 'Temperature (°C)'),
                 // Validator for required field
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -356,17 +364,17 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
               TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
-                decoration: InputDecoration(labelText: 'Comments'),
+                decoration: const InputDecoration(labelText: 'Comments'),
                 onSaved: (value) => _comments = value,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _areRequiredFieldsFilled ? _saveForm : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
                   _areRequiredFieldsFilled ? Colors.blue : Colors.grey,
                 ),
-                child: Text('Save'),
+                child: const Text('Save'),
               ),
             ],
           ),

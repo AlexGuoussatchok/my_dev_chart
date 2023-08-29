@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Dev Chart'),
+        title: const Text('My Dev Chart'),
       ),
       body: Center(
         child: Column(
@@ -22,16 +22,16 @@ class HomeScreen extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      minimumSize: Size(double.infinity, 60),
+                      minimumSize: const Size(double.infinity, 60),
                     ),
                     onPressed: () {
                       // Navigate to DevChartScreen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => DevChartScreen()),
+                        MaterialPageRoute(builder: (context) => const DevChartScreen()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'Dev Chart',
                       style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
                     ),
@@ -39,23 +39,23 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
-                      minimumSize: Size(double.infinity, 60),
+                      minimumSize: const Size(double.infinity, 60),
                     ),
                     onPressed: () {
                       // Navigate to MyDevChartScreen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MyDevChartScreen()),
+                        MaterialPageRoute(builder: (context) => const MyDevChartScreen()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'My Dev Chart',
                       style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
                     ),
@@ -63,23 +63,23 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
-                      minimumSize: Size(double.infinity, 60),
+                      minimumSize: const Size(double.infinity, 60),
                     ),
                     onPressed: () {
                       // Navigate to MyDevNotesScreen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MyDevNotesScreen()),
+                        MaterialPageRoute(builder: (context) => const MyDevNotesScreen()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'My Dev Notes',
                       style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
                     ),

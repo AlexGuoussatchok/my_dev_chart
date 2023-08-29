@@ -7,11 +7,12 @@ class MyDevChartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Dev Chart'),
+        title: const Text('My Dev Chart'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('My Dev Chart Screen Content'),
       ),
     );
   }
 }
+

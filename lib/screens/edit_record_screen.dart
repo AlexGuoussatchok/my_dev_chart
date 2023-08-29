@@ -72,75 +72,75 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Record'),
+        title: const Text('Edit Record'),
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _filmNumberController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Film Number'),
+                decoration: const InputDecoration(labelText: 'Film Number'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _filmController,
-                decoration: InputDecoration(labelText: 'Film'),
+                decoration: const InputDecoration(labelText: 'Film'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _isoController,
-                decoration: InputDecoration(labelText: 'ISO'),
+                decoration: const InputDecoration(labelText: 'ISO'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _filmTypeController,
-                decoration: InputDecoration(labelText: 'Film Type'),
+                decoration: const InputDecoration(labelText: 'Film Type'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _cameraController,
-                decoration: InputDecoration(labelText: 'Camera'),
+                decoration: const InputDecoration(labelText: 'Camera'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _lensesController,
-                decoration: InputDecoration(labelText: 'Lenses'),
+                decoration: const InputDecoration(labelText: 'Lenses'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _developerController,
-                decoration: InputDecoration(labelText: 'Developer'),
+                decoration: const InputDecoration(labelText: 'Developer'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _dilutionController,
-                decoration: InputDecoration(labelText: 'Dilution'),
+                decoration: const InputDecoration(labelText: 'Dilution'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _developingTimeController,
-                decoration: InputDecoration(labelText: 'Developing Time'),
+                decoration: const InputDecoration(labelText: 'Developing Time'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _temperatureController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Temperature'),
+                decoration: const InputDecoration(labelText: 'Temperature'),
                 // Add validation and saving logic
               ),
               TextFormField(
                 controller: _commentsController,
-                decoration: InputDecoration(labelText: 'Comments'),
+                decoration: const InputDecoration(labelText: 'Comments'),
                 // Add validation and saving logic
               ),
               ElevatedButton(
                 onPressed: _updateRecord,
-                child: Text('Save Changes'),
+                child: const Text('Save Changes'),
               ),
             ],
           ),

@@ -17,7 +17,7 @@ class RecordDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Record Details'),
+        title: const Text('Record Details'),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -33,11 +33,11 @@ class RecordDetailsScreen extends StatelessWidget {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'edit',
                 child: Text('Edit Record'),
               ),
-              PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'delete',
                 child: Text('Delete Record'),
               ),
@@ -46,7 +46,7 @@ class RecordDetailsScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

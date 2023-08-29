@@ -13,38 +13,35 @@ class MyDevNotesScreen extends StatefulWidget {
   const MyDevNotesScreen({Key? key}) : super(key: key);
 
   @override
-  _MyDevNotesScreenState createState() => _MyDevNotesScreenState();
+  MyDevNotesScreenState createState() => MyDevNotesScreenState();
 }
 
-class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
+class MyDevNotesScreenState extends State<MyDevNotesScreen> {
   late DatabaseHelper dbHelper;
 
   @override
   void initState() {
     super.initState();
-    dbHelper = DatabaseHelper();
-    printAppDocumentsDirectory();
+    dbHelper = DatabaseHelper(); // Initialize dbHelper here
   }
 
-  Future<void> printAppDocumentsDirectory() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    print('App Documents Directory: ${appDocDir.path}');
-  }
+  Future<void> exportDatabase(BuildContext context) async {
+    // Capture the context in a local variable
+    final localContext = context;
 
-  Future<void> exportDatabase(BuildContext context) async { // Pass the context as a parameter
     // Request external storage permission
     final status = await Permission.storage.request();
     if (!status.isGranted) {
       // Handle the case where permission is denied
       showDialog(
-        context: context,
+        context: localContext, // Use the local context here
         builder: (context) => AlertDialog(
-          title: Text('Permission Denied'),
-          content: Text('Permission denied for exporting.'),
+          title: const Text('Permission Denied'),
+          content: const Text('Permission denied for exporting.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
+              onPressed: () => Navigator.pop(localContext), // Use the local context here
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -66,12 +63,12 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Export Successful'),
-          content: Text('The database was exported successfully to Documents folder.'),
+          title: const Text('Export Successful'),
+          content: const Text('The database was exported successfully to the Documents folder.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -81,12 +78,12 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Export Error'),
+          title: const Text('Export Error'),
           content: Text('An error occurred while exporting the database: $error'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -134,14 +131,11 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Dev Notes'),
+        title: const Text('My Dev Notes'),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -153,11 +147,11 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
             },
             itemBuilder: (BuildContext context) {
               return [
-                PopupMenuItem<String>(
+                const PopupMenuItem<String>(
                   value: 'export',
                   child: Text('Export database'),
                 ),
-                PopupMenuItem<String>(
+                const PopupMenuItem<String>(
                   value: 'import',
                   child: Text('Import database'),
                 ),
@@ -173,7 +167,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                minimumSize: Size(double.infinity, 60),
+                minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
                 Navigator.push(
@@ -181,16 +175,16 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
                   MaterialPageRoute(builder: (context) => BrowseRecordsScreen(dbHelper: dbHelper)), // Pass dbHelper here
                 );
               },
-              child: Text(
+              child: const Text(
                 'Browse records',
                 style: TextStyle(fontSize: 20 * 1.7),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                minimumSize: Size(double.infinity, 60),
+                minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
                 Navigator.push(
@@ -198,16 +192,16 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
                   MaterialPageRoute(builder: (context) => AddNewRecordScreen(dbHelper: dbHelper)), // Pass dbHelper here
                 );
               },
-              child: Text(
+              child: const Text(
                 'Add a new record',
                 style: TextStyle(fontSize: 20 * 1.7),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
-                minimumSize: Size(double.infinity, 60),
+                minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
                 Navigator.push(
@@ -215,7 +209,7 @@ class _MyDevNotesScreenState extends State<MyDevNotesScreen> {
                   MaterialPageRoute(builder: (context) => StatisticsScreen(dbHelper: dbHelper)), // Pass dbHelper here
                 );
               },
-              child: Text(
+              child: const Text(
                 'Statistics',
                 style: TextStyle(fontSize: 20 * 1.7),
               ),

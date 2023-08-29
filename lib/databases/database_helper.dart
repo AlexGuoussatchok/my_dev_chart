@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
@@ -22,10 +23,10 @@ class DatabaseHelper {
       await db.execute('''
         CREATE TABLE IF NOT EXISTS my_dev_notes (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          filmNumber TEXT,
+          filmNumber INTEGER,
           date TEXT,
           film TEXT,
-          selectedIso TEXT,
+          selectedIso INTEGER,
           filmType TEXT,
           camera TEXT,
           lenses TEXT,
@@ -42,15 +43,12 @@ class DatabaseHelper {
   Future<int> getHighestFilmNumber() async {
     final db = await database;
     final result = await db.rawQuery('SELECT MAX(filmNumber) FROM my_dev_notes');
-    final maxFilmNumberString = result.first['MAX(filmNumber)'] as String?;
-    int? highestFilmNumber =
-    maxFilmNumberString != null ? int.tryParse(maxFilmNumberString) : null;
-    return highestFilmNumber ?? 0;
+    final highestFilmNumber = result.first['MAX(filmNumber)'] as int?;
+    return highestFilmNumber != null ? highestFilmNumber + 1 : 1;
   }
 
-  Future<void> insertFilm(Map<String, dynamic> filmData) async {
+  Future<void> insertFilmWithContext(BuildContext context, Map<String, dynamic> filmData) async {
     final db = await database;
-
     final existingRecords = await db.query(
       'my_dev_notes',
       where: 'filmNumber = ?',
@@ -58,12 +56,32 @@ class DatabaseHelper {
     );
 
     if (existingRecords.isNotEmpty) {
-      // Film number already exists, handle accordingly (show error, etc.)
-      return;
+      // Film number already exists, schedule the alert dialog using Future.microtask
+      Future.microtask(() {
+        _showDuplicateFilmNumberDialog(context);
+      });
+      return; // Return early without inserting the new film data
     }
 
     await db.insert('my_dev_notes', filmData);
   }
+
+
+  void _showDuplicateFilmNumberDialog(BuildContext context) {
+    AlertDialog(
+      title: const Text('Duplicate Film Number'),
+      content: const Text('The film with this number already exists in the list.'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // Close the dialog
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
 
   Future<void> updateRecord(Map<String, dynamic> updatedData) async {
     final db = await database;
@@ -115,7 +133,6 @@ class DatabaseHelper {
       if (status.isGranted) {
         Directory documentsDirectory = await getApplicationDocumentsDirectory();
         String currentDbPath = join(documentsDirectory.path, 'my_dev_notes.db');
-
         Directory? externalDirectory = await getExternalStorageDirectory();
 
         if (externalDirectory == null) {
@@ -174,6 +191,5 @@ class DatabaseHelper {
       print('Import Error: $error');
     }
   }
-
 
 }
