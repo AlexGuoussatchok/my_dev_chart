@@ -68,6 +68,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
     super.initState();
     fetchAndSetFilmNumber();
     _filmType = 'type 135';
+    _selectedDate = DateTime.now().toLocal();
   }
 
   Future<void> fetchAndSetFilmNumber() async {
@@ -78,7 +79,6 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
     });
   }
 
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -86,7 +86,8 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
+
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
       });
@@ -115,7 +116,7 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
 
       Map<String, dynamic> filmData = {
         'filmNumber': newFilmNumber.toString(),
-        'date': _selectedDate?.toIso8601String(),
+        'date': _selectedDate!.toLocal().toIso8601String().split('T')[0], // Store the formatted date
         'film': _selectedFilm,
         'selectedIso': _selectedIso,
         'filmType': _filmType,

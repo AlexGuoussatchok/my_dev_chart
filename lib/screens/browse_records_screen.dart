@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_dev_chart/databases/database_helper.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
 import 'package:my_dev_chart/screens/record_details_screen.dart';
+import 'package:intl/intl.dart';
+
 
 class BrowseRecordsScreen extends StatelessWidget {
   final DatabaseHelper dbHelper;
@@ -37,7 +39,7 @@ class BrowseRecordsScreen extends StatelessWidget {
 
                 return ListTile(
                   title: Text('Film Number: ${record.filmNumber.toString()}'),
-                  subtitle: Text('Date: ${record.date.toString()}\nFilm: ${record.film}\nISO: ${record.selectedIso}\nDeveloper: ${record.developer}'),
+                  subtitle: Text('Date: ${DateFormat('yyyy-MM-dd').format(record.date)}\nFilm: ${record.film}\nISO: ${record.selectedIso}\nDeveloper: ${record.developer}'),
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => RecordDetailsScreen(record),

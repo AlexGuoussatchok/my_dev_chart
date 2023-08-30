@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
 import 'package:my_dev_chart/databases/database_helper.dart';
 import 'package:my_dev_chart/screens/edit_record_screen.dart';
+import 'package:intl/intl.dart';
 
 class RecordDetailsScreen extends StatelessWidget {
   final RecordClass record;
@@ -52,7 +53,7 @@ class RecordDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Film Number: ${record.filmNumber}'),
-            Text('Date: ${record.date.toString()}'),
+            Text('Date: ${DateFormat('yyyy-MM-dd').format(record.date)}'),
             Text('Film: ${record.film}'),
             Text('ISO: ${record.selectedIso}'),
             Text('Film Type: ${record.filmType}'),
