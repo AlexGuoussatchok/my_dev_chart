@@ -44,8 +44,10 @@ class DatabaseHelper {
     final db = await database;
     final result = await db.rawQuery('SELECT MAX(filmNumber) FROM my_dev_notes');
     final highestFilmNumber = result.first['MAX(filmNumber)'] as int?;
-    return highestFilmNumber != null ? highestFilmNumber + 1 : 1;
+
+    return highestFilmNumber ?? 0;
   }
+
 
   Future<void> insertFilmWithContext(BuildContext context, Map<String, dynamic> filmData) async {
     final db = await database;
@@ -110,7 +112,7 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (index) {
       return RecordClass(
-        filmNumber: maps[index]['filmNumber'].toString(),
+        filmNumber: maps[index]['filmNumber'],
         date: DateTime.parse(maps[index]['date']),
         film: maps[index]['film'],
         selectedIso: maps[index]['selectedIso'],

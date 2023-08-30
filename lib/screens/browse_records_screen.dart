@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_dev_chart/databases/database_helper.dart';
 import 'package:my_dev_chart/extra_classes/record_class.dart';
-import 'package:my_dev_chart/screens/record_details_screen.dart'; // Import the new details screen
+import 'package:my_dev_chart/screens/record_details_screen.dart';
 
 class BrowseRecordsScreen extends StatelessWidget {
   final DatabaseHelper dbHelper;
@@ -36,7 +36,7 @@ class BrowseRecordsScreen extends StatelessWidget {
                 final record = snapshot.data![index];
 
                 return ListTile(
-                  title: Text('Film Number: ${record.filmNumber}'),
+                  title: Text('Film Number: ${record.filmNumber.toString()}'),
                   subtitle: Text('Date: ${record.date.toString()}\nFilm: ${record.film}\nISO: ${record.selectedIso}\nDeveloper: ${record.developer}'),
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(

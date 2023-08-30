@@ -1,8 +1,8 @@
 class RecordClass {
-  final String filmNumber;
+  final int filmNumber;
   final DateTime date;
   final String film;
-  final String selectedIso;
+  final int selectedIso;
   final String filmType;
   final String? camera;
   final String? lenses;

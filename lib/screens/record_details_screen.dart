@@ -9,7 +9,8 @@ class RecordDetailsScreen extends StatelessWidget {
   RecordDetailsScreen(this.record);
 
   Future<void> _deleteRecord(BuildContext context) async {
-    await DatabaseHelper().deleteRecord(record.filmNumber); // Assuming filmNumber is unique
+    await DatabaseHelper().deleteRecord(record.filmNumber.toString());
+    // Assuming filmNumber is unique
     Navigator.pop(context);
   }
 

@@ -73,10 +73,11 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
   Future<void> fetchAndSetFilmNumber() async {
     final highestFilmNumber = await widget.dbHelper.getHighestFilmNumber();
     setState(() {
-      _lastUsedFilmNumber = highestFilmNumber;
+      _lastUsedFilmNumber = highestFilmNumber + 1;
       _filmNumberController.text = _lastUsedFilmNumber.toString();
     });
   }
+
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -106,12 +107,14 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Increment film number
-      _lastUsedFilmNumber++;
-      _filmNumberController.text = _lastUsedFilmNumber.toString();
+      // Retrieve the highest film number from the database
+      final highestFilmNumber = await widget.dbHelper.getHighestFilmNumber();
+
+      // Increment the highest film number by 1
+      final newFilmNumber = highestFilmNumber + 1;
 
       Map<String, dynamic> filmData = {
-        'filmNumber': _filmNumberController.text,
+        'filmNumber': newFilmNumber.toString(),
         'date': _selectedDate?.toIso8601String(),
         'film': _selectedFilm,
         'selectedIso': _selectedIso,
@@ -125,8 +128,11 @@ class _AddNewRecordScreenState extends State<AddNewRecordScreen> {
         'comments': _comments,
       };
 
+      // Call the insertFilmWithContext method with filmData
+      await widget.dbHelper.insertFilmWithContext(context, filmData);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

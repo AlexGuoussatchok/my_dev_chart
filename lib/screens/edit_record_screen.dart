@@ -29,9 +29,9 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
   @override
   void initState() {
     super.initState();
-    _filmNumberController.text = widget.record.filmNumber;
+    _filmNumberController.text = widget.record.filmNumber.toString();
     _filmController.text = widget.record.film;
-    _isoController.text = widget.record.selectedIso;
+    _isoController.text = widget.record.selectedIso.toString();
     _filmTypeController.text = widget.record.filmType;
     _cameraController.text = widget.record.camera ?? '';
     _lensesController.text = widget.record.lenses ?? '';
