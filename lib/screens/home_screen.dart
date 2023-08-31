@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dev_chart_screen.dart'; // Import the DevChartScreen class
-import 'my_dev_chart_screen.dart'; // Import the MyDevChartScreen class
-import 'my_dev_notes_screen.dart'; // Import the MyDevNotesScreen class
+import 'dev_chart_screen.dart';
+import 'my_dev_chart_screen.dart';
+import 'my_dev_notes_screen.dart';
+import 'catalogue_screen.dart';
+import 'inventory_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -81,6 +83,54 @@ class HomeScreen extends StatelessWidget {
                     },
                     child: const Text(
                       'My Dev Notes',
+                      style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey, // Customize button color here
+                      minimumSize: const Size(double.infinity, 60),
+                    ),
+                    onPressed: () {
+                      // Navigate to Inventory
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const InventoryScreen()), // Replace with your InventoryScreen
+                      );
+                    },
+                    child: const Text(
+                      'Inventory',
+                      style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow, // Customize button color here
+                      minimumSize: const Size(double.infinity, 60),
+                    ),
+                    onPressed: () {
+                      // Navigate to Catalogue
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CatalogueScreen()), // Replace with your CatalogueScreen
+                      );
+                    },
+                    child: const Text(
+                      'Catalogue',
                       style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
                     ),
                   ),
