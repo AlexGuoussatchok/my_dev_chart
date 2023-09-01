@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'darkroom_screen.dart';
-import 'catalogue_screen.dart';
-import 'inventory_screen.dart';
+import 'package:my_dev_chart/screens/my_dev_notes_screen.dart';
+import 'dev_chart_screen.dart';
+import 'my_dev_chart_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class DarkroomScreen extends StatelessWidget {
+  const DarkroomScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Dev Chart'),
+        title: const Text('Darkroom'),
       ),
       body: Center(
         child: Column(
@@ -22,16 +22,13 @@ class HomeScreen extends StatelessWidget {
                 minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
-                // Navigate to Inventory
+                // Navigate to DevChartScreen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const InventoryScreen()),
+                  MaterialPageRoute(builder: (context) => const DevChartScreen()),
                 );
               },
-              child: const Text(
-                'Inventory',
-                style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
-              ),
+              child: const Text('Dev Chart', style: TextStyle(fontSize: 20 * 1.7)),
             ),
             const SizedBox(height: 16), // Add vertical spacing
             ElevatedButton(
@@ -40,34 +37,28 @@ class HomeScreen extends StatelessWidget {
                 minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
-                // Navigate to Catalogue
+                // Navigate to MyDevChartScreen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CatalogueScreen()),
+                  MaterialPageRoute(builder: (context) => const MyDevChartScreen()),
                 );
               },
-              child: const Text(
-                'Catalogue',
-                style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
-              ),
+              child: const Text('My Dev Chart', style: TextStyle(fontSize: 20 * 1.7)),
             ),
             const SizedBox(height: 16), // Add vertical spacing
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.grey, // Customize button color here
                 minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
-                // Navigate to DarkroomScreen
+                // Navigate to MyDevNotesScreen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DarkroomScreen()),
+                  MaterialPageRoute(builder: (context) => const MyDevNotesScreen()),
                 );
               },
-              child: const Text(
-                'Darkroom',
-                style: TextStyle(fontSize: 20 * 1.7), // Increase font size by 70%
-              ),
+              child: const Text('My Dev Notes', style: TextStyle(fontSize: 20 * 1.7)),
             ),
           ],
         ),
