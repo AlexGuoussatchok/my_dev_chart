@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'my_cameras_screen.dart';
 import 'my_lenses_screen.dart';
 import 'my_films_screen.dart';
+import 'package:my_dev_chart/databases/my_films_database_helper.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class InventoryScreen extends StatelessWidget {
           children: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.grey,
                 minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
@@ -36,7 +37,7 @@ class InventoryScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.grey,
                 minimumSize: const Size(double.infinity, 60),
               ),
               onPressed: () {
@@ -54,13 +55,17 @@ class InventoryScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.grey, // Set the background color
                 minimumSize: const Size(double.infinity, 60),
               ),
-              onPressed: () {
-                // Navigate to FilmsScreen (You'll need to create this screen)
+              onPressed: () async {
+                final BuildContext currentContext = context;
+                final myFilmsHelper = MyFilmsDatabaseHelper.instance;
+
+                await myFilmsHelper.initializeDatabase();
+
                 Navigator.push(
-                  context,
+                  currentContext,
                   MaterialPageRoute(builder: (context) => const FilmsScreen()),
                 );
               },
@@ -68,7 +73,7 @@ class InventoryScreen extends StatelessWidget {
                 'Films',
                 style: TextStyle(fontSize: 20 * 1.7),
               ),
-            ),
+            )
           ],
         ),
       ),

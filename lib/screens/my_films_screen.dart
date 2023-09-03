@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_dev_chart/screens/add_my_films_record_screen.dart';
 
 class FilmsScreen extends StatelessWidget {
   const FilmsScreen({Key? key}) : super(key: key);
@@ -8,9 +9,31 @@ class FilmsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Films'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'addFilm') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddMyFilmsRecordScreen(),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem<String>(
+                  value: 'addFilm',
+                  child: Text('Add a film'),
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: const Center(
-        child: Text('Films Screen Content'),
+        child: Text('My Films Screen Content'),
       ),
     );
   }
