@@ -16,7 +16,7 @@ class FilmsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddMyFilmsRecordScreen(),
+                    builder: (context) => AddMyFilmsRecordScreen(),
                   ),
                 );
               }

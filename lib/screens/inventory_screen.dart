@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'my_cameras_screen.dart';
 import 'my_lenses_screen.dart';
 import 'my_films_screen.dart';
-import 'package:my_dev_chart/databases/my_films_database_helper.dart';
+import 'package:my_dev_chart/databases/my_inventory_database_helper.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({Key? key}) : super(key: key);
@@ -60,9 +60,6 @@ class InventoryScreen extends StatelessWidget {
               ),
               onPressed: () async {
                 final BuildContext currentContext = context;
-                final myFilmsHelper = MyFilmsDatabaseHelper.instance;
-
-                await myFilmsHelper.initializeDatabase();
 
                 Navigator.push(
                   currentContext,
