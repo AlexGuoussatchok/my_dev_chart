@@ -4,7 +4,6 @@ import 'package:my_dev_chart/extra_classes/my_films.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class AddMyFilmsRecordScreen extends StatefulWidget {
   const AddMyFilmsRecordScreen({Key? key}) : super(key: key);
 
@@ -17,9 +16,12 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   late Database _userFilmsRecordsDatabase; // For user film records
   late Database _readOnlyFilmsCatalogueDatabase; // For read-only film brands;
 
-  String _selectedBrand = 'Ilford'; // Initialize with a default value
+  String _selectedBrand = ''; // Initialize with a default value
+  String _selectedFilmName = ''; // Initialize with an empty string
+
 
   List<String> _brandList = [];
+  List<String> _filmNames = []; // Initialize as an empty list
   final TextEditingController _filmBrandController = TextEditingController();
   final TextEditingController _filmNameController = TextEditingController();
   final TextEditingController _filmTypeController = TextEditingController();
@@ -95,6 +97,19 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     }
   }
 
+  Future<List<String>> fetchFilmNames(String selectedBrand) async {
+    final tableName = '$selectedBrand' + '_films_catalogue';
+    final queryResult = await _readOnlyFilmsCatalogueDatabase.query(
+      tableName,
+      columns: ['film_name'],
+    );
+
+    final filmNames = queryResult
+        .map((row) => row['film_name'].toString())
+        .toList();
+
+    return filmNames;
+  }
 
   @override
   void dispose() {
@@ -142,7 +157,15 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      _selectedBrand = newValue!; // Update the selected brand when the user makes a selection
+                      _selectedBrand = newValue!;
+                      // Fetch film names based on the selected brand
+                      fetchFilmNames(_selectedBrand).then((filmNames) {
+                        setState(() {
+                          _filmNames = filmNames;
+                          // If available, set the first film name as the initial selection
+                          _selectedFilmName = _filmNames.isNotEmpty ? _filmNames[0] : '';
+                        });
+                      });
                     });
                   },
                   validator: (value) {
@@ -155,16 +178,28 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 const SizedBox(height: 16),
 
                 // Film Name
-                TextFormField(
-                  controller: _filmNameController,
+                DropdownButtonFormField<String>(
+                  value: _selectedFilmName,
                   decoration: const InputDecoration(labelText: 'Film Name'),
+                  items: _filmNames.map((String filmName) {
+                    return DropdownMenuItem<String>(
+                      value: filmName,
+                      child: Text(filmName),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedFilmName = newValue!;
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter Film Name';
+                      return 'Please select Film Name';
                     }
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 // Film Type
