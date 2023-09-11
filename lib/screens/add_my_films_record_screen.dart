@@ -16,11 +16,12 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   late Database _userFilmsRecordsDatabase; // For user film records
   late Database _readOnlyFilmsCatalogueDatabase; // For read-only film brands;
 
-  String _selectedBrand = ''; // Initialize with a default value
+  String _selectedBrand = ''; // Initialize with an empty string
   String _selectedFilmName = ''; // Initialize with an empty string
+  String _selectedFilmType = ''; // Initialize with an empty string
 
 
-  List<String> _brandList = [];
+  List<String> _brandList = []; // Initialize as an empty list
   List<String> _filmNames = []; // Initialize as an empty list
   final TextEditingController _filmBrandController = TextEditingController();
   final TextEditingController _filmNameController = TextEditingController();
@@ -111,6 +112,25 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     return filmNames;
   }
 
+  Future<String> fetchFilmType(String selectedBrand, String selectedFilmName) async {
+    final tableName = '$selectedBrand' + '_films_catalogue';
+    final queryResult = await _readOnlyFilmsCatalogueDatabase.query(
+      tableName,
+      columns: ['film_type'],
+      where: 'film_name = ?',
+      whereArgs: [selectedFilmName],
+    );
+
+    if (queryResult.isNotEmpty) {
+      final filmType = queryResult.first['film_type'] as String;
+      print('Fetched film type: $filmType'); // Add this print statement
+      return filmType;
+    } else {
+      print('Film type not found.'); // Add this print statement
+      return ''; // Return an empty string or handle the case when film type is not found
+    }
+  }
+
   @override
   void dispose() {
     // Close both databases when the screen is disposed
@@ -122,7 +142,6 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   @override
   Widget build(BuildContext context) {
     print('_selectedBrand: $_selectedBrand');
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add a Film'),
@@ -139,13 +158,11 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 _isFormValid = _formKey.currentState?.validate() ?? false;
               });
             },
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
-                // Film Brand
 
+                // Film Brand
                 DropdownButtonFormField<String>(
                   value: _selectedBrand, // Set the selected brand value
                   decoration: const InputDecoration(labelText: 'Film Brand'),
@@ -177,7 +194,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Film Name
+                // Film Name Dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedFilmName,
                   decoration: const InputDecoration(labelText: 'Film Name'),
@@ -190,6 +207,15 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedFilmName = newValue!;
+                      // Fetch the film type from the database based on the selected brand and film name
+                      fetchFilmType(_selectedBrand, _selectedFilmName).then((filmType) {
+                        print('Fetched film type: $filmType'); // Add this print statement
+                        setState(() {
+                          _selectedFilmType = filmType; // Update _selectedFilmType
+                          _filmTypeController.text = filmType; // Update the text in the controller
+                        });
+                        print('Updated film type in controller: ${_filmTypeController.text}');
+                      });
                     });
                   },
                   validator: (value) {
@@ -199,12 +225,11 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
 
                 // Film Type
                 TextFormField(
-                  controller: _filmTypeController,
+                  controller: _filmTypeController, // Use the TextEditingController
                   decoration: const InputDecoration(labelText: 'Film Type'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -214,6 +239,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
+
 
                 // Film Size
                 TextFormField(
