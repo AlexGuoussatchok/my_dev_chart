@@ -3,6 +3,8 @@ import 'package:my_dev_chart/databases/my_inventory_database_helper.dart';
 import 'package:my_dev_chart/extra_classes/my_films.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:my_dev_chart/lists/film_sizes_list.dart';
+
 
 class AddMyFilmsRecordScreen extends StatefulWidget {
   const AddMyFilmsRecordScreen({Key? key}) : super(key: key);
@@ -19,10 +21,13 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   String _selectedBrand = ''; // Initialize with an empty string
   String _selectedFilmName = ''; // Initialize with an empty string
   String _selectedFilmType = ''; // Initialize with an empty string
+  String _selectedFilmSize = '';
+
 
 
   List<String> _brandList = []; // Initialize as an empty list
   List<String> _filmNames = []; // Initialize as an empty list
+
   final TextEditingController _filmBrandController = TextEditingController();
   final TextEditingController _filmNameController = TextEditingController();
   final TextEditingController _filmTypeController = TextEditingController();
@@ -41,6 +46,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     _initUserFilmsRecordsDatabase();
     // Initialize the read-only database for film brands
     _initReadOnlyFilmsCatalogueDatabase();
+    _selectedFilmSize = filmSizeValues.isNotEmpty ? filmSizeValues[0] : '';
   }
 
   Future<void> _initReadOnlyFilmsCatalogueDatabase() async {
@@ -241,17 +247,29 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 const SizedBox(height: 16),
 
 
-                // Film Size
-                TextFormField(
-                  controller: _filmSizeController,
+                // Film Size Dropdown
+                DropdownButtonFormField<String>(
+                  value: _selectedFilmSize,
                   decoration: const InputDecoration(labelText: 'Film Size'),
+                  items: filmSizeValues.map((String size) {
+                    return DropdownMenuItem<String>(
+                      value: size,
+                      child: Text(size),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedFilmSize = newValue ?? '';
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter Film Size';
+                      return 'Please select Film Size';
                     }
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 // Film ISO
