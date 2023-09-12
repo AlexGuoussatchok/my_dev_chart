@@ -22,6 +22,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   String _selectedFilmName = ''; // Initialize with an empty string
   String _selectedFilmType = ''; // Initialize with an empty string
   String _selectedFilmSize = '';
+  String _selectedFilmISO = '';
 
 
 
@@ -137,6 +138,23 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     }
   }
 
+  Future<String> fetchFilmISO(String selectedBrand, String selectedFilmName) async {
+    final tableName = '$selectedBrand' + '_films_catalogue';
+    final queryResult = await _readOnlyFilmsCatalogueDatabase.query(
+      tableName,
+      columns: ['film_speed'],
+      where: 'film_name = ?',
+      whereArgs: [selectedFilmName],
+    );
+
+    if (queryResult.isNotEmpty) {
+      final filmISO = queryResult.first['film_speed'].toString();
+      return filmISO;
+    } else {
+      return '';
+    }
+  }
+
   @override
   void dispose() {
     // Close both databases when the screen is disposed
@@ -221,6 +239,12 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                           _filmTypeController.text = filmType; // Update the text in the controller
                         });
                         print('Updated film type in controller: ${_filmTypeController.text}');
+                      });
+                      // Fetch the film ISO from the database based on the selected brand and film name
+                      fetchFilmISO(_selectedBrand, _selectedFilmName).then((filmISO) {
+                        setState(() {
+                          _filmIsoController.text = filmISO;
+                        });
                       });
                     });
                   },
