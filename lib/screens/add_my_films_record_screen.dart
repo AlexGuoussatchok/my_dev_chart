@@ -23,8 +23,10 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   String _selectedFilmType = ''; // Initialize with an empty string
   String _selectedFilmSize = '';
   String _selectedFilmISO = '';
+  String _selectedExpirationDate = 'Undefined'; // Default value
 
-
+  // Variable to store the selected date from the date picker
+  DateTime? _selectedDate;
 
   List<String> _brandList = []; // Initialize as an empty list
   List<String> _filmNames = []; // Initialize as an empty list
@@ -155,12 +157,38 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     }
   }
 
+  // Function to open the date picker
+  Future<void> _pickExpirationDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        // Format the picked date as yyyy-mm and store it
+        _selectedExpirationDate = "${picked.year}-${picked.month.toString().padLeft(2, '0')}";
+        _selectedDate = picked;
+      });
+    }
+  }
+
   @override
   void dispose() {
     // Close both databases when the screen is disposed
     _userFilmsRecordsDatabase.close();
     _readOnlyFilmsCatalogueDatabase.close();
     super.dispose();
+  }
+
+  // Your form submission logic here
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      // Save the form data to the database, including _selectedExpirationDate
+      // ...
+    }
   }
 
   @override
@@ -325,17 +353,19 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 const SizedBox(height: 16),
 
                 // Expiration Date
-                TextFormField(
-                  controller: _expirationDateController,
-                  decoration: const InputDecoration(labelText: 'Expiration Date'),
-                  keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Film Expiration Date';
-                    }
-                    return null;
-                  },
+                ListTile(
+                  title: Text('Expiration Date'),
+                  subtitle: Text(
+                    _selectedExpirationDate == 'Undefined'
+                        ? 'If date not set, the expiration date is undefined'
+                        : 'Expiration Date: $_selectedExpirationDate',
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () => _pickExpirationDate(context),
+                    child: Text('Set Date'),
+                  ),
                 ),
+
                 const SizedBox(height: 16),
 
                 // Quantity
@@ -355,18 +385,16 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 ElevatedButton(
                   onPressed: _isFormValid
                       ? () async {
-                    // Implement the logic to save the film record
-                    // You can access the form fields' values from the controllers
                     final filmBrand = _filmBrandController.text;
                     final filmName = _filmNameController.text;
                     final filmType = _filmTypeController.text;
                     final filmSize = _filmSizeController.text;
                     final filmIso = int.tryParse(_filmIsoController.text) ?? 0;
                     final framesNumber = int.tryParse(_framesNumberController.text) ?? 0;
-                    final expirationDate = _expirationDateController.text;
+                    final expirationDate =
+                    _selectedExpirationDate == 'Undefined' ? 'Undefined' : _selectedExpirationDate;
                     final quantity = int.tryParse(_quantityController.text) ?? 0;
 
-                    // Now, you have the values, perform validation if needed, and save the record
                     // Create a MyFilms object with the values
                     final film = MyFilms(
                       brand: filmBrand,
