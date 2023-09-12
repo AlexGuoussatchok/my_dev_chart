@@ -34,7 +34,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   final TextEditingController _filmTypeController = TextEditingController();
   final TextEditingController _filmSizeController = TextEditingController();
   final TextEditingController _filmIsoController = TextEditingController();
-  final TextEditingController _framesNumberController = TextEditingController();
+  final TextEditingController _framesNumberController = TextEditingController(text: '36');
   final TextEditingController _expirationDateController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
