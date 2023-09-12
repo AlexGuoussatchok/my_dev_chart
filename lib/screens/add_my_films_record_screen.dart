@@ -183,14 +183,6 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     super.dispose();
   }
 
-  // Your form submission logic here
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Save the form data to the database, including _selectedExpirationDate
-      // ...
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     print('_selectedBrand: $_selectedBrand');
@@ -369,17 +361,46 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 const SizedBox(height: 16),
 
                 // Quantity
-                TextFormField(
-                  controller: _quantityController,
-                  decoration: const InputDecoration(labelText: 'Quantity'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Frames Quantity';
-                    }
-                    return null;
-                  },
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _quantityController,
+                        decoration: InputDecoration(labelText: 'Quantity'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter Frames Quantity';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        int currentValue = int.tryParse(_quantityController.text) ?? 1;
+                        setState(() {
+                          currentValue++;
+                          _quantityController.text = currentValue.toString();
+                        });
+                      },
+                      icon: Icon(Icons.add),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        int currentValue = int.tryParse(_quantityController.text) ?? 1;
+                        if (currentValue > 1) {
+                          setState(() {
+                            currentValue--;
+                            _quantityController.text = currentValue.toString();
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.remove),
+                    ),
+                  ],
                 ),
+
                 const SizedBox(height: 16),
 
                 ElevatedButton(
