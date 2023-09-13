@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'my_cameras_screen.dart';
 import 'my_lenses_screen.dart';
 import 'my_films_screen.dart';
-import 'package:my_dev_chart/databases/my_inventory_database_helper.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({Key? key}) : super(key: key);
@@ -26,7 +25,7 @@ class InventoryScreen extends StatelessWidget {
                 // Navigate to CamerasScreen (You'll need to create this screen)
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CamerasScreen()),
+                  MaterialPageRoute(builder: (context) => CamerasScreen()), // Remove 'const'
                 );
               },
               child: const Text(
@@ -44,7 +43,7 @@ class InventoryScreen extends StatelessWidget {
                 // Navigate to LensesScreen (You'll need to create this screen)
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LensesScreen()),
+                  MaterialPageRoute(builder: (context) => LensesScreen()), // Remove 'const'
                 );
               },
               child: const Text(
@@ -63,7 +62,7 @@ class InventoryScreen extends StatelessWidget {
 
                 Navigator.push(
                   currentContext,
-                  MaterialPageRoute(builder: (context) => const FilmsScreen()),
+                  MaterialPageRoute(builder: (context) => FilmsScreen()), // Remove 'const'
                 );
               },
               child: const Text(
@@ -71,6 +70,7 @@ class InventoryScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20 * 1.7),
               ),
             )
+
           ],
         ),
       ),

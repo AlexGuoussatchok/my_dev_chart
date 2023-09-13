@@ -6,10 +6,10 @@ import 'package:my_dev_chart/extra_classes/my_films.dart';
 class InventoryDatabaseHelper {
   static Database? _database;
 
-  static Future<void> initializeDatabase() async {
+  Future<void> initialize() async {
     if (_database == null) {
       final path = join(await getDatabasesPath(), 'inventory.db');
-      print('Database path: $path'); // Add this line to print the database path
+      print('Database path: $path');
 
       bool databaseExists = await File(path).exists();
 
@@ -67,8 +67,17 @@ class InventoryDatabaseHelper {
     }
   }
 
+  Future<void> close() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+      print('Database closed.');
+    }
+  }
+
   static Future<List<MyFilms>> getAllFilms() async {
-    await initializeDatabase();
+    final dbHelper = InventoryDatabaseHelper(); // Create an instance
+    await dbHelper.initialize(); // Initialize the database
 
     final db = _database;
 
@@ -92,6 +101,7 @@ class InventoryDatabaseHelper {
       return [];
     }
   }
+
 
   Future<void> insertFilm(MyFilms film) async {
     try {

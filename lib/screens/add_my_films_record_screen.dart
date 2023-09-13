@@ -16,20 +16,19 @@ class AddMyFilmsRecordScreen extends StatefulWidget {
 class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late Database _userFilmsRecordsDatabase; // For user film records
-  late Database _readOnlyFilmsCatalogueDatabase; // For read-only film brands;
+  late Database _readOnlyFilmsCatalogueDatabase; // For read-only film brands
 
-  String _selectedBrand = ''; // Initialize with an empty string
-  String _selectedFilmName = ''; // Initialize with an empty string
-  String _selectedFilmType = ''; // Initialize with an empty string
+  String _selectedBrand = '';
+  String _selectedFilmName = '';
+  String _selectedFilmType = '';
   String _selectedFilmSize = '';
   String _selectedFilmISO = '';
-  String _selectedExpirationDate = 'Undefined'; // Default value
+  String _selectedExpirationDate = 'Undefined';
 
-  // Variable to store the selected date from the date picker
   DateTime? _selectedDate;
 
-  List<String> _brandList = []; // Initialize as an empty list
-  List<String> _filmNames = []; // Initialize as an empty list
+  List<String> _brandList = [];
+  List<String> _filmNames = [];
 
   final TextEditingController _filmBrandController = TextEditingController();
   final TextEditingController _filmNameController = TextEditingController();
@@ -53,15 +52,13 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   }
 
   Future<void> _initReadOnlyFilmsCatalogueDatabase() async {
-    // Open the read-only database for film brands directly from assets
     try {
       print('Opening read-only films catalogue database...');
       _readOnlyFilmsCatalogueDatabase = await openDatabase('assets/films_catalogue.db');
       print('Read-only films catalogue database opened successfully.');
-      await _loadBrandNames(); // Wait for brand names to be loaded
-      _selectedBrand = _brandList.isNotEmpty ? _brandList[0] : ''; // Set the selected brand if available
+      await _loadBrandNames();
+      _selectedBrand = _brandList.isNotEmpty ? _brandList[0] : '';
     } catch (e) {
-      // Handle the error
       print('Error initializing read-only films catalogue database: $e');
     }
   }
@@ -70,13 +67,11 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
     final dbPath = await getDatabasesPath();
     final userDbPath = join(dbPath, 'films_catalogue.db');
 
-    // Open the user database for film records
     try {
       print('Opening user films records database...');
       _userFilmsRecordsDatabase = await openDatabase(userDbPath);
       print('User films records database opened successfully.');
     } catch (e) {
-      // Handle the error
       print('Error initializing user films records database: $e');
     }
   }
@@ -84,15 +79,14 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   // Function to load brand names from the database
   Future<void> _loadBrandNames() async {
     try {
-      const tableName = 'film_brands'; // Specify the table name here
-      final dbPath = _readOnlyFilmsCatalogueDatabase.path; // Get the database path
+      const tableName = 'film_brands';
+      final dbPath = _readOnlyFilmsCatalogueDatabase.path;
       print('Loading brand names from table $tableName in database at path $dbPath...');
       print('Loading brand names...');
       final brands = await _readOnlyFilmsCatalogueDatabase.query('film_brands', columns: ['brand']);
       print('Query executed successfully.');
-      print('Resulting brands: $brands'); // Print the query result
+      print('Resulting brands: $brands');
 
-      // Extract brand names and sort them alphabetically
       final uniqueBrands = brands.map((brandMap) => brandMap['brand'].toString()).toSet().toList();
       uniqueBrands.sort();
 
@@ -100,9 +94,11 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
         print('Brand names loaded successfully.');
         _brandList = uniqueBrands;
         _selectedBrand = _brandList.isNotEmpty ? _brandList[0] : '';
+        // Set the initial values of brand and name controllers
+        _filmBrandController.text = _selectedBrand;
+        _filmNameController.text = _selectedFilmName;
       });
     } catch (e) {
-      // Handle any errors that occur during the database query
       print('Error loading brand names: $e');
     }
   }
@@ -185,7 +181,6 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('_selectedBrand: $_selectedBrand');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add a Film'),
@@ -195,9 +190,8 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode.disabled, // Disable auto-validation
+            autovalidateMode: AutovalidateMode.disabled,
             onChanged: () {
-              // When the form changes, check if it's valid
               setState(() {
                 _isFormValid = _formKey.currentState?.validate() ?? false;
               });
@@ -205,10 +199,9 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // Film Brand
                 DropdownButtonFormField<String>(
-                  value: _selectedBrand, // Set the selected brand value
+                  value: _selectedBrand,
                   decoration: const InputDecoration(labelText: 'Film Brand'),
                   items: _brandList.map((String brand) {
                     return DropdownMenuItem<String>(
@@ -219,19 +212,19 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedBrand = newValue!;
-                      // Fetch film names based on the selected brand
                       fetchFilmNames(_selectedBrand).then((filmNames) {
                         setState(() {
                           _filmNames = filmNames;
-                          // If available, set the first film name as the initial selection
                           _selectedFilmName = _filmNames.isNotEmpty ? _filmNames[0] : '';
+                          // Update the controllers here
+                          _filmNameController.text = _selectedFilmName;
                         });
                       });
                     });
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please select Film Brand'; // Add validation for selecting a brand
+                      return 'Please select Film Brand';
                     }
                     return null;
                   },
@@ -251,16 +244,15 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedFilmName = newValue!;
-                      // Fetch the film type from the database based on the selected brand and film name
                       fetchFilmType(_selectedBrand, _selectedFilmName).then((filmType) {
-                        print('Fetched film type: $filmType'); // Add this print statement
+                        print('Fetched film type: $filmType');
                         setState(() {
-                          _selectedFilmType = filmType; // Update _selectedFilmType
-                          _filmTypeController.text = filmType; // Update the text in the controller
+                          _selectedFilmType = filmType;
+                          _filmTypeController.text = filmType;
                         });
                         print('Updated film type in controller: ${_filmTypeController.text}');
                       });
-                      // Fetch the film ISO from the database based on the selected brand and film name
+
                       fetchFilmISO(_selectedBrand, _selectedFilmName).then((filmISO) {
                         setState(() {
                           _filmIsoController.text = filmISO;
@@ -304,6 +296,8 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedFilmSize = newValue ?? '';
+                      // Update the controller here
+                      _filmSizeController.text = _selectedFilmSize;
                     });
                   },
                   validator: (value) {
