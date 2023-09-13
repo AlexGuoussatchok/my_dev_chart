@@ -18,10 +18,10 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
   late Database _userFilmsRecordsDatabase; // For user film records
   late Database _readOnlyFilmsCatalogueDatabase; // For read-only film brands
 
-  String _selectedBrand = '';
-  String _selectedFilmName = '';
+  String? _selectedBrand;
+  String? _selectedFilmName;
   String _selectedFilmType = '';
-  String _selectedFilmSize = '';
+  String? _selectedFilmSize;
   String _selectedFilmISO = '';
   String _selectedExpirationDate = 'Undefined';
 
@@ -95,8 +95,9 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
         _brandList = uniqueBrands;
         _selectedBrand = _brandList.isNotEmpty ? _brandList[0] : '';
         // Set the initial values of brand and name controllers
-        _filmBrandController.text = _selectedBrand;
-        _filmNameController.text = _selectedFilmName;
+        _filmBrandController.text = _selectedBrand ?? '';
+        _filmNameController.text = _selectedFilmName ?? '';
+
       });
     } catch (e) {
       print('Error loading brand names: $e');
@@ -155,16 +156,15 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
 
   // Function to open the date picker
   Future<void> _pickExpirationDate(BuildContext context) async {
-    final DateTime picked = (await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
-    ))!;
+    );
 
     if (picked != null && picked != _selectedDate) {
       setState(() {
-        // Format the picked date as yyyy-mm and store it
         _selectedExpirationDate = "${picked.year}-${picked.month.toString().padLeft(2, '0')}";
         _selectedDate = picked;
       });
@@ -200,24 +200,26 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Film Brand
-                DropdownButtonFormField<String>(
-                  value: _selectedBrand,
+                DropdownButtonFormField<String?>(
+                  value: _selectedBrand, // Set the selected brand value
                   decoration: const InputDecoration(labelText: 'Film Brand'),
                   items: _brandList.map((String brand) {
-                    return DropdownMenuItem<String>(
+                    return DropdownMenuItem<String?>(
                       value: brand,
                       child: Text(brand),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      _selectedBrand = newValue!;
-                      fetchFilmNames(_selectedBrand).then((filmNames) {
+                      _selectedBrand = newValue;
+                      // Reset the selected film name when the brand changes
+                      _selectedFilmName = null;
+                      // Fetch film names based on the selected brand
+                      fetchFilmNames(_selectedBrand ?? '').then((filmNames) {
                         setState(() {
                           _filmNames = filmNames;
-                          _selectedFilmName = _filmNames.isNotEmpty ? _filmNames[0] : '';
-                          // Update the controllers here
-                          _filmNameController.text = _selectedFilmName;
+                          // If available, set the first film name as the initial selection
+                          _selectedFilmName = _filmNames.isNotEmpty ? _filmNames[0] : null;
                         });
                       });
                     });
@@ -232,28 +234,29 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 const SizedBox(height: 16),
 
                 // Film Name Dropdown
-                DropdownButtonFormField<String>(
+                DropdownButtonFormField<String?>(
                   value: _selectedFilmName,
                   decoration: const InputDecoration(labelText: 'Film Name'),
                   items: _filmNames.map((String filmName) {
-                    return DropdownMenuItem<String>(
+                    return DropdownMenuItem<String?>(
                       value: filmName,
                       child: Text(filmName),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      _selectedFilmName = newValue!;
-                      fetchFilmType(_selectedBrand, _selectedFilmName).then((filmType) {
-                        print('Fetched film type: $filmType');
+                      _selectedFilmName = newValue;
+                      // Reset the selected film size when the film name changes
+                      _selectedFilmSize = null;
+                      // Fetch the film type from the database based on the selected brand and film name
+                      fetchFilmType(_selectedBrand ?? '', _selectedFilmName ?? '').then((filmType) {
                         setState(() {
                           _selectedFilmType = filmType;
                           _filmTypeController.text = filmType;
                         });
-                        print('Updated film type in controller: ${_filmTypeController.text}');
                       });
-
-                      fetchFilmISO(_selectedBrand, _selectedFilmName).then((filmISO) {
+                      // Fetch the film ISO from the database based on the selected brand and film name
+                      fetchFilmISO(_selectedBrand ?? '', _selectedFilmName?? '').then((filmISO) {
                         setState(() {
                           _filmIsoController.text = filmISO;
                         });
@@ -282,7 +285,6 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 ),
                 const SizedBox(height: 16),
 
-
                 // Film Size Dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedFilmSize,
@@ -297,7 +299,7 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                     setState(() {
                       _selectedFilmSize = newValue ?? '';
                       // Update the controller here
-                      _filmSizeController.text = _selectedFilmSize;
+                      _filmSizeController.text = _selectedFilmSize?? '';
                     });
                   },
                   validator: (value) {
@@ -400,8 +402,8 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                 ElevatedButton(
                   onPressed: _isFormValid
                       ? () async {
-                    final filmBrand = _filmBrandController.text;
-                    final filmName = _filmNameController.text;
+                    final filmBrand = _selectedBrand ?? '';
+                    final filmName = _selectedFilmName ?? '';
                     final filmType = _filmTypeController.text;
                     final filmSize = _filmSizeController.text;
                     final filmIso = int.tryParse(_filmIsoController.text) ?? 0;
@@ -409,6 +411,8 @@ class _AddMyFilmsRecordScreenState extends State<AddMyFilmsRecordScreen> {
                     final expirationDate =
                     _selectedExpirationDate == 'Undefined' ? 'Undefined' : _selectedExpirationDate;
                     final quantity = int.tryParse(_quantityController.text) ?? 0;
+
+                    print('Film Name: $filmName'); // Add this line for debugging
 
                     // Create a MyFilms object with the values
                     final film = MyFilms(
