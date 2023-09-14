@@ -25,7 +25,7 @@ class CatalogueScreen extends StatelessWidget {
                 // Navigate to Cameras Catalogue
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CamerasCatalogueScreen()),
+                  MaterialPageRoute(builder: (context) => CamerasCatalogueScreen()),
                 );
               },
               child: const Text(
